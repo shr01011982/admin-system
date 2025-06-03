@@ -1,0 +1,68 @@
+package com.v2soft.userservice.controller;
+
+import com.v2soft.userservice.dto.UserDTO;
+import com.v2soft.userservice.service.UserService;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
+
+import java.util.List;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+@WebMvcTest(UserController.class)
+@Import(UserControllerTest.MockConfig.class)
+class UserControllerTest {
+
+    private final MockMvc mockMvc;
+    private final ObjectMapper objectMapper;
+    private final UserService userService;
+
+    UserControllerTest(MockMvc mockMvc, ObjectMapper objectMapper, UserService userService) {
+        this.mockMvc = mockMvc;
+        this.objectMapper = objectMapper;
+        this.userService = userService;
+    }
+
+    @TestConfiguration
+    static class MockConfig {
+        @Bean
+        public UserService userService() {
+            return Mockito.mock(UserService.class);
+        }
+    }
+
+    @Test
+    void testCreateUser() throws Exception {
+        UserDTO request = UserDTO.builder()
+                .username("john")
+                .email("john@example.com")
+                .roleIds(List.of(1L))
+                .build();
+
+        UserDTO response = UserDTO.builder()
+                .id(1L)
+                .username("john")
+                .email("john@example.com")
+                .roleIds(List.of(1L))
+                .build();
+
+        Mockito.when(userService.create(any())).thenReturn(response);
+
+        mockMvc.perform(post("/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1L))
+                .andExpect(jsonPath("$.username").value("john"))
+                .andExpect(jsonPath("$.email").value("john@example.com"));
+    }
+}

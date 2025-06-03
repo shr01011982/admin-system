@@ -1,0 +1,4 @@
+package com.v2soft.userservice.entity;
+
+public class User {
+}

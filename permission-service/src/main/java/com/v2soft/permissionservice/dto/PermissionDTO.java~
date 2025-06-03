@@ -1,0 +1,11 @@
+package com.v2soft.permissionservice.dto;
+import lombok.*;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class PermissionDTO {
+    private Long id;
+    private String name;
+}

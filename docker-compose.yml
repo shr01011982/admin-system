@@ -1,0 +1,28 @@
+# docker-compose.yml
+version: '3.8'
+services:
+  permission-service:
+    build: ./permission-service
+    ports:
+      - "8081:8081"
+    environment:
+      - SPRING_PROFILES_ACTIVE=default
+    depends_on: []
+
+  role-service:
+    build: ./role-service
+    ports:
+      - "8082:8082"
+    environment:
+      - SPRING_PROFILES_ACTIVE=default
+    depends_on:
+      - permission-service
+
+  user-service:
+    build: ./user-service
+    ports:
+      - "8083:8083"
+    environment:
+      - SPRING_PROFILES_ACTIVE=default
+    depends_on:
+      - role-service

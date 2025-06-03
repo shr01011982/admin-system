@@ -1,0 +1,4 @@
+package com.v2soft.permissionservice.service;
+
+public class PermissionService {
+}

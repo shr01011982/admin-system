@@ -1,0 +1,72 @@
+POST  http://localhost:8081/permissions
+{
+  "name": "VIEW_USERS"
+}
+GET http://localhost:8081/permissions/1
+PUT http://localhost:8081/permissions/1
+{
+  "name": "EDIT_USERS"
+}
+DELETE http://localhost:8081/permissions/1
+
+
+POST http://localhost:8082/roles
+{
+  "name": "ADMIN",
+  "permissionIds": [1]
+}
+GET http://localhost:8082/roles/1
+
+PUT http://localhost:8082/roles/1
+{
+  "name": "SUPER_ADMIN",
+  "permissionIds": [1]
+}
+DELETE http://localhost:8082/roles/1
+
+POST http://localhost:8083/users
+{
+  "username": "john",
+  "email": "john@example.com",
+  "roleIds": [1]
+}
+
+GET http://localhost:8083/users/1
+
+PUT http://localhost:8083/users/1
+{
+  "username": "john_updated",
+  "email": "john_updated@example.com",
+  "roleIds": [1]
+}
+
+DELETE http://localhost:8083/users/1
+
+GET http://localhost:8081/permissions
+
+GET http://localhost:8082/roles
+
+GET http://localhost:8083/users
+
+
+Run mvn clean install inside each service folder:
+cd permission-service && mvn clean install && cd ..
+cd role-service && mvn clean install && cd ..
+cd user-service && mvn clean install && cd ..
+
+Start all services using:
+docker-compose up --build
+
+
+# For permission-service
+cd permission-service
+mvn test
+
+# For role-service
+cd ../role-service
+mvn test
+
+# For user-service
+cd ../user-service
+mvn test
+

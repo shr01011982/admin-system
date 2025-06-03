@@ -1,0 +1,4 @@
+package com.v2soft.roleservice.entity;
+
+public class Role {
+}
