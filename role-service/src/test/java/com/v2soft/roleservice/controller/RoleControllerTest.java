@@ -1,0 +1,65 @@
+package com.v2soft.roleservice.controller;
+
+import com.v2soft.roleservice.dto.RoleDTO;
+import com.v2soft.roleservice.service.RoleService;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
+
+import java.util.List;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+@WebMvcTest(RoleController.class)
+@Import(RoleControllerTest.MockConfig.class)
+class RoleControllerTest {
+
+    private final MockMvc mockMvc;
+    private final ObjectMapper objectMapper;
+    private final RoleService roleService;
+
+    RoleControllerTest(MockMvc mockMvc, ObjectMapper objectMapper, RoleService roleService) {
+        this.mockMvc = mockMvc;
+        this.objectMapper = objectMapper;
+        this.roleService = roleService;
+    }
+
+    @TestConfiguration
+    static class MockConfig {
+        @Bean
+        public RoleService roleService() {
+            return Mockito.mock(RoleService.class);
+        }
+    }
+
+    @Test
+    void testCreateRole() throws Exception {
+        RoleDTO request = RoleDTO.builder()
+                .name("LEAD")
+                .permissionIds(List.of(1L))
+                .build();
+
+        RoleDTO response = RoleDTO.builder()
+                .id(1L)
+                .name("LEAD")
+                .permissionIds(List.of(1L))
+                .build();
+
+        Mockito.when(roleService.create(any())).thenReturn(response);
+
+        mockMvc.perform(post("/roles")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1L))
+                .andExpect(jsonPath("$.name").value("LEAD"));
+    }
+}

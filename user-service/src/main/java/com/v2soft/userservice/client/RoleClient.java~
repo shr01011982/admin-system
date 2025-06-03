@@ -1,0 +1,4 @@
+package com.v2soft.userservice.client;
+
+public class RoleClient {
+}

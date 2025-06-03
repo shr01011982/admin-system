@@ -1,0 +1,55 @@
+package com.v2soft.permissionservice.controller;
+
+import com.v2soft.permissionservice.dto.PermissionDTO;
+import com.v2soft.permissionservice.service.PermissionService;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+@WebMvcTest(PermissionController.class)
+@Import(PermissionControllerTest.MockConfig.class)
+class PermissionControllerTest {
+
+    private final MockMvc mockMvc;
+    private final ObjectMapper objectMapper;
+    private final PermissionService permissionService;
+
+    PermissionControllerTest(MockMvc mockMvc, ObjectMapper objectMapper, PermissionService permissionService) {
+        this.mockMvc = mockMvc;
+        this.objectMapper = objectMapper;
+        this.permissionService = permissionService;
+    }
+
+    @TestConfiguration
+    static class MockConfig {
+        @Bean
+        public PermissionService permissionService() {
+            return Mockito.mock(PermissionService.class);
+        }
+    }
+
+    @Test
+    void testCreatePermission() throws Exception {
+        PermissionDTO request = PermissionDTO.builder().name("CREATE_ROLE").build();
+        PermissionDTO response = PermissionDTO.builder().id(1L).name("CREATE_ROLE").build();
+
+        Mockito.when(permissionService.create(any())).thenReturn(response);
+
+        mockMvc.perform(post("/permissions")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1L))
+                .andExpect(jsonPath("$.name").value("CREATE_ROLE"));
+    }
+}

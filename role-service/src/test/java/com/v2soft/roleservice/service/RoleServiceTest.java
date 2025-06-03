@@ -1,0 +1,58 @@
+package com.v2soft.roleservice.service;
+
+import com.v2soft.roleservice.client.PermissionClient;
+import com.v2soft.roleservice.dto.RoleDTO;
+import com.v2soft.roleservice.entity.Role;
+import com.v2soft.roleservice.repository.RoleRepository;
+import com.v2soft.roleservice.service.impl.RoleServiceImpl;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.*;
+
+import java.util.List;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
+class RoleServiceTest {
+
+    @InjectMocks
+    private RoleServiceImpl roleService;
+
+    @Mock
+    private RoleRepository roleRepository;
+
+    @Mock
+    private PermissionClient permissionClient;
+
+    @BeforeEach
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
+    }
+
+    @Test
+    void testCreateRole() {
+        RoleDTO dto = RoleDTO.builder().name("ADMIN").permissionIds(List.of(1L)).build();
+        Role saved = Role.builder().id(1L).name("ADMIN").permissionIds(List.of(1L)).build();
+
+        when(roleRepository.save(any())).thenReturn(saved);
+
+        RoleDTO result = roleService.create(dto);
+
+        assertNotNull(result);
+        assertEquals("ADMIN", result.getName());
+        verify(roleRepository, times(1)).save(any());
+    }
+
+    @Test
+    void testGetById() {
+        Role role = Role.builder().id(1L).name("PDM").permissionIds(List.of(2L)).build();
+        when(roleRepository.findById(1L)).thenReturn(Optional.of(role));
+
+        RoleDTO result = roleService.getById(1L);
+
+        assertEquals("PDM", result.getName());
+        assertEquals(List.of(2L), result.getPermissionIds());
+    }
+}
